@@ -113,12 +113,6 @@ Debian:
 1. [Bandwagonhost/搬瓦工](https://bandwagonhost.com/aff.php?aff=41583)
 1. [Vultr](https://www.vultr.com/?ref=7265819)
 
-## Contact (备注：frp)
-
-- Email:
-- QQ: 3217680847
-- QQ群: 949022145
-- WeChat/微信群: wuuyh
 
 ## Website
 
