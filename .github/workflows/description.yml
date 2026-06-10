@@ -14,16 +14,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
-        with:
-          # [Required] Access token with `workflow` scope.
-          token: ${{ secrets.WORKFLOW_SECRET }}
       - name: Docker Hub Description
         uses: christian-korneck/update-container-description-action@v1
         env:
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_PASS: ${{ secrets.DOCKER_HUB_TOKEN }}
         with:
-          destination_container_repo: snowdreamtech/frpc
+          destination_container_repo: wuuyh/frpc
           provider: dockerhub
           short_description: ${{ github.event.repository.description }}
           readme_file: "README.md"
@@ -33,23 +30,7 @@ jobs:
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_PASS: ${{ secrets.DOCKER_HUB_TOKEN }}
         with:
-          destination_container_repo: snowdreamtech/frps
+          destination_container_repo: wuuyh/frps
           provider: dockerhub
           short_description: ${{ github.event.repository.description }}
           readme_file: "README.md"
-      # - name: Quay.io Description
-      #   uses: christian-korneck/update-container-description-action@v1
-      #   env:
-      #     DOCKER_APIKEY: ${{ secrets.QUAY_ROBOT_TOKEN }}
-      #   with:
-      #     destination_container_repo: quay.io/snowdreamtech/frpc
-      #     provider: quay
-      #     readme_file: "README.md"
-      # - name: Quay.io Description
-      #   uses: christian-korneck/update-container-description-action@v1
-      #   env:
-      #     DOCKER_APIKEY: ${{ secrets.QUAY_ROBOT_TOKEN }}
-      #   with:
-      #     destination_container_repo: quay.io/snowdreamtech/frps
-      #     provider: quay
-      #     readme_file: "README.md"

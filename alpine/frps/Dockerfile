@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM snowdreamtech/golang:1.25.8-alpine3.23 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.25.8-alpine3.23 AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -9,7 +9,8 @@ USER root
 # Set the workdir
 WORKDIR /root
 
-ENV FRP_VERSION=0.69.1
+ARG FRP_VERSION=0.69.1
+ENV FRP_VERSION=${FRP_VERSION}
 
 RUN apk add --no-cache make \
     nodejs \
@@ -24,19 +25,20 @@ RUN apk add --no-cache make \
     && cp -rfv bin conf /root/
 
 
-FROM snowdreamtech/alpine:3.23.2
+FROM alpine:3.23.2
+ARG FRP_VERSION=0.69.1
 
 # OCI annotations to image
-LABEL org.opencontainers.image.authors="Snowdream Tech" \
+LABEL org.opencontainers.image.authors="wuuyh" \
     org.opencontainers.image.title="frps Image Based On Alpine" \
     org.opencontainers.image.description="Docker Images for frps on Alpine. (i386, amd64, arm32v6, arm32v7, arm64, ppc64le,riscv64, s390x)" \
-    org.opencontainers.image.documentation="https://hub.docker.com/r/snowdreamtech/frps" \
-    org.opencontainers.image.base.name="snowdreamtech/frps:alpine" \
+    org.opencontainers.image.documentation="https://hub.docker.com/r/wuuyh/frps" \
+    org.opencontainers.image.base.name="wuuyh/frps:alpine" \
     org.opencontainers.image.licenses="MIT" \
-    org.opencontainers.image.source="https://github.com/snowdreamtech/frp" \
-    org.opencontainers.image.vendor="Snowdream Tech" \
-    org.opencontainers.image.version="0.69.1" \
-    org.opencontainers.image.url="https://github.com/snowdreamtech/frp"
+    org.opencontainers.image.source="https://github.com/wuuyh/frp" \
+    org.opencontainers.image.vendor="wuuyh" \
+    org.opencontainers.image.version="${FRP_VERSION}" \
+    org.opencontainers.image.url="https://github.com/wuuyh/frp"
 
 
 # Switch to the user
@@ -44,6 +46,8 @@ USER root
 
 # Set the workdir
 WORKDIR /root
+
+RUN apk add --no-cache ca-certificates su-exec
 
 # keep the docker container running
 ARG KEEPALIVE=0 \

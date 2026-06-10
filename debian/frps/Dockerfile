@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM snowdreamtech/golang:1.24.4-trixie AS builder
+FROM --platform=$BUILDPLATFORM golang:1.24.4-trixie AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -9,13 +9,16 @@ USER root
 # Set the workdir
 WORKDIR /root
 
-ENV FRP_VERSION=0.69.1
+ARG FRP_VERSION=0.69.1
+ENV FRP_VERSION=${FRP_VERSION}
 
 RUN set -eux \
     && apt-get -qqy update  \
-    && apt-get -qqy install --no-install-recommends \ 
+    && apt-get -qqy install --no-install-recommends \
     make \
     nodejs \
+    ca-certificates \
+    wget \
     npm \
     && wget -c https://github.com/fatedier/frp/archive/refs/tags/v${FRP_VERSION}.tar.gz \
     && tar zxvf v${FRP_VERSION}.tar.gz \
@@ -32,25 +35,34 @@ RUN set -eux \
     && rm -rf /var/tmp/*
 
 
-FROM snowdreamtech/debian:13.1.0
+FROM debian:trixie
+ARG FRP_VERSION=0.69.1
 
 # OCI annotations to image
-LABEL org.opencontainers.image.authors="Snowdream Tech" \
+LABEL org.opencontainers.image.authors="wuuyh" \
     org.opencontainers.image.title="frps Image Based On Debian" \
     org.opencontainers.image.description="Docker Images for frps On Debian. (i386,amd64,arm32v5,arm32v7,arm64,mips64le,ppc64le,s390x)" \
-    org.opencontainers.image.documentation="https://hub.docker.com/r/snowdreamtech/frps" \
-    org.opencontainers.image.base.name="snowdreamtech/frps:debian" \
+    org.opencontainers.image.documentation="https://hub.docker.com/r/wuuyh/frps" \
+    org.opencontainers.image.base.name="wuuyh/frps:debian" \
     org.opencontainers.image.licenses="MIT" \
-    org.opencontainers.image.source="https://github.com/snowdreamtech/frp" \
-    org.opencontainers.image.vendor="Snowdream Tech" \
-    org.opencontainers.image.version="0.69.1" \
-    org.opencontainers.image.url="https://github.com/snowdreamtech/frp"
+    org.opencontainers.image.source="https://github.com/wuuyh/frp" \
+    org.opencontainers.image.vendor="wuuyh" \
+    org.opencontainers.image.version="${FRP_VERSION}" \
+    org.opencontainers.image.url="https://github.com/wuuyh/frp"
 
 # Switch to the user
 USER root
 
 # Set the workdir
 WORKDIR /root
+
+RUN set -eux \
+    && apt-get -qqy update \
+    && apt-get -qqy install --no-install-recommends \
+    ca-certificates \
+    gosu \
+    && apt-get -qqy clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # keep the docker container running
 ARG DEBIAN_FRONTEND=noninteractive \

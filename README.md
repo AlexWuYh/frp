@@ -1,14 +1,14 @@
 # frp
 
-![Docker Image Version](https://img.shields.io/docker/v/snowdreamtech/frps)
-![Docker Image Size](https://img.shields.io/docker/image-size/snowdreamtech/frps/latest)
-![Docker Pulls](https://img.shields.io/docker/pulls/snowdreamtech/frps)
-![Docker Stars](https://img.shields.io/docker/stars/snowdreamtech/frps)
+![Docker Image Version](https://img.shields.io/docker/v/wuuyh/frps)
+![Docker Image Size](https://img.shields.io/docker/image-size/wuuyh/frps/latest)
+![Docker Pulls](https://img.shields.io/docker/pulls/wuuyh/frps)
+![Docker Stars](https://img.shields.io/docker/stars/wuuyh/frps)
 
-![Docker Image Version](https://img.shields.io/docker/v/snowdreamtech/frpc)
-![Docker Image Size](https://img.shields.io/docker/image-size/snowdreamtech/frpc/latest)
-![Docker Pulls](https://img.shields.io/docker/pulls/snowdreamtech/frpc)
-![Docker Stars](https://img.shields.io/docker/stars/snowdreamtech/frpc)
+![Docker Image Version](https://img.shields.io/docker/v/wuuyh/frpc)
+![Docker Image Size](https://img.shields.io/docker/image-size/wuuyh/frpc/latest)
+![Docker Pulls](https://img.shields.io/docker/pulls/wuuyh/frpc)
+![Docker Stars](https://img.shields.io/docker/stars/wuuyh/frpc)
 
 Docker Images for Frp Based on Alpine and Debian.
 
@@ -23,42 +23,42 @@ Docker Images for Frp Based on Alpine and Debian.
 ### Basic
 
 ```bash
-docker run --restart=always --network host -d -v /etc/frp/frps.toml:/etc/frp/frps.toml --name frps snowdreamtech/frps
-docker run --restart=always --network host -d -v /etc/frp/frpc.toml:/etc/frp/frpc.toml --name frpc snowdreamtech/frpc
+docker run --restart=always --network host -d -v /etc/frp/frps.toml:/etc/frp/frps.toml --name frps wuuyh/frps
+docker run --restart=always --network host -d -v /etc/frp/frpc.toml:/etc/frp/frpc.toml --name frpc wuuyh/frpc
 ```
 
 ### Alpine
 
 ```bash
-docker run --restart=always --network host -d -v /etc/frp/frps.toml:/etc/frp/frps.toml --name frps snowdreamtech/frps:alpine
-docker run --restart=always --network host -d -v /etc/frp/frpc.toml:/etc/frp/frpc.toml --name frpc snowdreamtech/frpc:alpine
+docker run --restart=always --network host -d -v /etc/frp/frps.toml:/etc/frp/frps.toml --name frps wuuyh/frps:alpine
+docker run --restart=always --network host -d -v /etc/frp/frpc.toml:/etc/frp/frpc.toml --name frpc wuuyh/frpc:alpine
 ```
 
 ### Debian
 
 ```bash
-docker run --restart=always --network host -d -v /etc/frp/frps.toml:/etc/frp/frps.toml --name frps snowdreamtech/frps:debian
-docker run --restart=always --network host -d -v /etc/frp/frpc.toml:/etc/frp/frpc.toml --name frpc snowdreamtech/frpc:debian
+docker run --restart=always --network host -d -v /etc/frp/frps.toml:/etc/frp/frps.toml --name frps wuuyh/frps:debian
+docker run --restart=always --network host -d -v /etc/frp/frpc.toml:/etc/frp/frpc.toml --name frpc wuuyh/frpc:debian
 ```
 
 ```bash
-docker run --restart=always --network host -d -v /etc/frp/frps.toml:/etc/frp/frps.toml --name frps snowdreamtech/frps:trixie
-docker run --restart=always --network host -d -v /etc/frp/frpc.toml:/etc/frp/frpc.toml --name frpc snowdreamtech/frpc:trixie
+docker run --restart=always --network host -d -v /etc/frp/frps.toml:/etc/frp/frps.toml --name frps wuuyh/frps:trixie
+docker run --restart=always --network host -d -v /etc/frp/frpc.toml:/etc/frp/frpc.toml --name frpc wuuyh/frpc:trixie
 ```
 
 ## Quick reference
 
 - Where to file issues:
 
-[https://github.com/snowdreamtech/frp/issues](https://github.com/snowdreamtech/frp/issues)
+[https://github.com/wuuyh/frp/issues](https://github.com/wuuyh/frp/issues)
 
 - Where to join discussions:
 
-[https://github.com/snowdreamtech/frp/discussions](https://github.com/snowdreamtech/frp/discussions)
+[https://github.com/wuuyh/frp/discussions](https://github.com/wuuyh/frp/discussions)
 
 - Maintained by:
 
-snowdream <sn0wdr1am@qq.com>
+wuuyh
 
 - Supported architectures: ([more info](https://github.com/docker-library/official-images#architectures-other-than-amd64))
 
@@ -99,19 +99,19 @@ Debian:
 
 ## Contact (备注：frp)
 
-- Email: sn0wdr1am@qq.com
+- Email:
 - QQ: 3217680847
 - QQ群: 949022145
-- WeChat/微信群: sn0wdr1am
+- WeChat/微信群: wuuyh
 
 ## Website
 
 1. [fatedier/frp](https://github.com/fatedier/frp)
-1. [snowdreamtech/frp](https://github.com/snowdreamtech/frp)
-1. [frpc images on Github](https://github.com/snowdreamtech/frp/pkgs/container/frpc)
-1. [frps images on Github](https://github.com/snowdreamtech/frp/pkgs/container/frps)
-1. [frpc images on Docker Hub ](https://hub.docker.com/r/snowdreamtech/frpc)
-1. [frps images on Docker Hub ](https://hub.docker.com/r/snowdreamtech/frps)
+1. [wuuyh/frp](https://github.com/wuuyh/frp)
+1. [frpc images on Github](https://github.com/wuuyh/frp/pkgs/container/frpc)
+1. [frps images on Github](https://github.com/wuuyh/frp/pkgs/container/frps)
+1. [frpc images on Docker Hub ](https://hub.docker.com/r/wuuyh/frpc)
+1. [frps images on Docker Hub ](https://hub.docker.com/r/wuuyh/frps)
 
 ## License
 
@@ -119,4 +119,4 @@ MIT
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=snowdreamtech/frp&type=Date)](https://star-history.com/#snowdreamtech/frp&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=wuuyh/frp&type=Date)](https://star-history.com/#wuuyh/frp&Date)

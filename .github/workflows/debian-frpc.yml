@@ -37,12 +37,16 @@ on:
     - cron: "0 19 * * *"
   workflow_dispatch:
 
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   buildx:
     runs-on: ubuntu-latest
     steps:
       # - name: Bypass Cloudflare for Github Action Pro
-      #   uses: snowdreamtech/bypass-cloudflare-for-github-action@v0.0.4
+      #   uses: wuuyh/bypass-cloudflare-for-github-action@v0.0.4
       #   with:
       #     mode: 'list'
       #     cf_account_id: ${{ secrets.CF_ACCOUNT_ID }}
@@ -66,54 +70,53 @@ jobs:
             swap-storage: false      
       - name: Checkout
         uses: actions/checkout@v6.0.2
-        with:
-          # [Required] Access token with `workflow` scope.
-          token: ${{ secrets.WORKFLOW_SECRET }}
-      - name: Set env variables
+      - name: Resolve frp version
+        id: frp
+        shell: bash
         run: |
-          echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
-          echo "http_proxy=${http_proxy}" >> $GITHUB_ENV
-          echo "no_proxy=${no_proxy}" >> $GITHUB_ENV
+          tag="$(curl -fsSL https://api.github.com/repos/fatedier/frp/releases/latest | jq -r '.tag_name')"
+          if [[ -z "$tag" || "$tag" == "null" ]]; then
+            echo "Failed to resolve latest fatedier/frp release" >&2
+            exit 1
+          fi
+          version="${tag#v}"
+          minor="${version%.*}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "minor=$minor" >> "$GITHUB_OUTPUT"
+          echo "FRP_VERSION=$version" >> "$GITHUB_ENV"
       - # Add support for more platforms with QEMU (optional)
         # https://github.com/docker/setup-qemu-action
         name: Set up QEMU
         uses: docker/setup-qemu-action@v4.0.0
       - # https://github.com/docker/setup-buildx-action/issues/57#issuecomment-1059657292
         # https://github.com/docker/buildx/issues/136#issuecomment-550205439
-        # docker buildx create --driver-opt env.http_proxy=$http_proxy --driver-opt env.https_proxy=$https_proxy --driver-opt '"env.no_proxy='$no_proxy'"'
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4.0.0
         with:
           buildkitd-config: .github/buildkitd.toml
-          driver-opts: |
-            env.http_proxy=${{ env.http_proxy }}
-            env.https_proxy=${{ env.http_proxy }}
-            "env.no_proxy='${{ env.no_proxy}}'"
+      - name: Validate DockerHub secrets
+        if: github.event_name != 'pull_request'
+        shell: bash
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+        run: |
+          if [[ -z "$DOCKER_HUB_USERNAME" || -z "$DOCKER_HUB_TOKEN" ]]; then
+            echo "DOCKER_HUB_USERNAME and DOCKER_HUB_TOKEN secrets are required to publish Docker images." >&2
+            exit 1
+          fi
       - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v4.1.0
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
-      - name: Login to Quay.io
-        uses: docker/login-action@v4.1.0
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4.1.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v6.0.0
         with:
           images: |
-            name=snowdreamtech/frpc,enable=true
-            name=ghcr.io/snowdreamtech/frpc,enable=true
-            name=quay.io/snowdreamtech/frpc,enable=true
+            name=wuuyh/frpc,enable=true
           flavor: |
             latest=false  
             prefix=
@@ -124,6 +127,8 @@ jobs:
             type=raw,enable=${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name != 'schedule' }},priority=200,prefix=,suffix=,value=debian
             type=raw,enable=${{ startsWith(github.ref, 'refs/tags/') }},priority=200,prefix=,suffix=,value=debian
             type=schedule,enable=true,priority=1000,prefix=,suffix=-debian,pattern=nightly
+            type=raw,enable=${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'schedule' || startsWith(github.ref, 'refs/tags/')) }},priority=900,prefix=,suffix=-debian,value=${{ steps.frp.outputs.version }}
+            type=raw,enable=${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'schedule' || startsWith(github.ref, 'refs/tags/')) }},priority=850,prefix=,suffix=-debian,value=${{ steps.frp.outputs.minor }}
             type=match,enable=true,priority=800,prefix=,suffix=-debian,pattern=\d+.\d+.\d+,group=0,value=
             type=match,enable=true,priority=800,prefix=,suffix=-debian,pattern=\d+.\d+,group=0,value=
             type=match,enable=${{ !startsWith(github.ref, 'refs/tags/0.') && !startsWith(github.ref, 'refs/tags/v0.') && !startsWith(github.ref, 'refs/tags/V0.') && !startsWith(github.ref, 'refs/tags/debian-0.') && !startsWith(github.ref, 'refs/tags/debian-v0.') && !startsWith(github.ref, 'refs/tags/debian-V0.') }},priority=800,prefix=,suffix=-debian,pattern=\d+,group=0,value=
@@ -132,6 +137,8 @@ jobs:
             type=raw,enable=${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name != 'schedule' }},priority=200,prefix=,suffix=,value=trixie
             type=raw,enable=${{ startsWith(github.ref, 'refs/tags/') }},priority=200,prefix=,suffix=,value=trixie
             type=schedule,enable=true,priority=1000,prefix=,suffix=-trixie,pattern=nightly
+            type=raw,enable=${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'schedule' || startsWith(github.ref, 'refs/tags/')) }},priority=900,prefix=,suffix=-trixie,value=${{ steps.frp.outputs.version }}
+            type=raw,enable=${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'schedule' || startsWith(github.ref, 'refs/tags/')) }},priority=850,prefix=,suffix=-trixie,value=${{ steps.frp.outputs.minor }}
             type=match,enable=true,priority=800,prefix=,suffix=-trixie,pattern=\d+.\d+.\d+,group=0,value=
             type=match,enable=true,priority=800,prefix=,suffix=-trixie,pattern=\d+.\d+,group=0,value=
             type=match,enable=${{ !startsWith(github.ref, 'refs/tags/0.') && !startsWith(github.ref, 'refs/tags/v0.') && !startsWith(github.ref, 'refs/tags/V0.') && !startsWith(github.ref, 'refs/tags/debian-0.') && !startsWith(github.ref, 'refs/tags/debian-v0.') && !startsWith(github.ref, 'refs/tags/debian-V0.') }},priority=800,prefix=,suffix=-trixie,pattern=\d+,group=0,value=
@@ -142,8 +149,7 @@ jobs:
         with:
           context: debian/frpc
           build-args: |
-            "http_proxy=${{ env.http_proxy }}"
-            "https_proxy=${{ env.http_proxy }}"
+            FRP_VERSION=${{ steps.frp.outputs.version }}
             BUILDTIME=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
             VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
             REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
@@ -153,4 +159,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: ${{ github.event_name != 'pull_request' && 'type=gha,mode=max' || '' }}
