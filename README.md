@@ -91,6 +91,8 @@ Debian:
 
 ## Base Images
 
+> `:latest` (and untagged `wuuyh/frps` / `wuuyh/frpc`) points to the **Alpine** build. The Debian variant has no `:latest` — pull it explicitly with `:trixie` or `:debian`.
+
 | Variant | Builder Stage               | Runtime Stage    |
 |---------|-----------------------------|------------------|
 | Alpine  | `golang:1.25.8-alpine3.23`  | `alpine:3.23.2`  |
