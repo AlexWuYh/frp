@@ -89,6 +89,20 @@ Debian:
     - 0.69-debian
     - 0.69.1-debian
 
+## Base Images
+
+| Variant | Builder Stage               | Runtime Stage    |
+|---------|-----------------------------|------------------|
+| Alpine  | `golang:1.25.8-alpine3.23`  | `alpine:3.23.2`  |
+| Debian  | `golang:1.25.8-trixie`      | `debian:trixie`  |
+
+### Bumping base image versions
+
+- **Alpine** — edit the `FROM` line in `alpine/{frpc,frps}/Dockerfile` directly. Pin the runtime tag (e.g. `alpine:3.23.2`) and the builder tag together.
+- **Debian** — change `GOLANG_VERSION` in two places: the `ARG GOLANG_VERSION=...` default in `debian/{frpc,frps}/Dockerfile`, AND the `GOLANG_VERSION=...` entry in the `build-args` of `.github/workflows/debian-{frpc,frps}.yml`. The `debian:trixie` runtime tag is a rolling tag that tracks Debian 13.
+
+> Go's Docker Hub tags don't always ship the latest patch on every base. If a build fails with `image: not found`, verify the requested Go version is still being published for that base on the [golang tags page](https://hub.docker.com/_/golang/tags).
+
 ## Ads
 
 1. [腾讯云](https://cloud.tencent.com/act/cps/redirect?redirect=2446&cps_key=d09c5e921f9fcf4ac9516564262f3b99&from=console)
